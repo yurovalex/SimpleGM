@@ -72,6 +72,7 @@
     </property>
     <addaction name="actionPoints"/>
     <addaction name="actionLines"/>
+    <addaction name="actionSplines"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuView"/>
@@ -193,7 +194,8 @@
   </action>
   <action name="actionPoints">
    <property name="icon">
-    <iconset theme="QIcon::ThemeIcon::ApplicationExit"/>
+    <iconset resource="occqt.qrc">
+     <normaloff>:/Resources/points.png</normaloff>:/Resources/points.png</iconset>
    </property>
    <property name="text">
     <string>&amp;Points</string>
@@ -201,7 +203,8 @@
   </action>
   <action name="actionLines">
    <property name="icon">
-    <iconset theme="QIcon::ThemeIcon::CallStop"/>
+    <iconset resource="occqt.qrc">
+     <normaloff>:/Resources/lines.png</normaloff>:/Resources/lines.png</iconset>
    </property>
    <property name="text">
     <string>&amp;Lines</string>
@@ -210,6 +213,15 @@
   <action name="actionCircle">
    <property name="text">
     <string>&amp;Circle</string>
+   </property>
+  </action>
+  <action name="actionSplines">
+   <property name="icon">
+    <iconset resource="occqt.qrc">
+     <normaloff>:/Resources/spline.png</normaloff>:/Resources/spline.png</iconset>
+   </property>
+   <property name="text">
+    <string>Splines</string>
    </property>
   </action>
  </widget>

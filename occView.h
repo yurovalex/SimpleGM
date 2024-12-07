@@ -39,6 +39,7 @@ public slots:
     //! operations for the view.
     void pan(void);
     void fitAll(void);
+    void redraw();
     void deleteAll(void);
     void reset(void);
     void zoom(void);

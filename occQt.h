@@ -47,6 +47,10 @@ private slots:
     //!Lines
     void lines();
 
+    //!Splines
+    void splines();
+
+
 
 
 private:

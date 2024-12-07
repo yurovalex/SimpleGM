@@ -21,5 +21,8 @@
         <file>Resources/revolve.png</file>
         <file>Resources/helix.png</file>
         <file>Resources/delete.PNG</file>
+        <file>Resources/points.png</file>
+        <file>Resources/lines.png</file>
+        <file>Resources/spline.png</file>
     </qresource>
 </RCC>

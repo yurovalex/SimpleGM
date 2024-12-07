@@ -50,6 +50,7 @@ void occQt::createActions( void )
     //2D
     connect(ui.actionPoints, SIGNAL(triggered()), this, SLOT(points()));
     connect(ui.actionLines, SIGNAL(triggered()), this, SLOT(lines()));
+    connect(ui.actionSplines, SIGNAL(triggered()), this, SLOT(splines()));
 
     // Primitive
     connect(ui.actionBox, SIGNAL(triggered()), this, SLOT(makeBox()));
@@ -157,5 +158,31 @@ void occQt::lines()
     myOccView->getContext()->Display(lineVision, Standard_True);
 }
 
+
+// Include OpenCascade libraries
+ #include <Geom_BezierCurve.hxx>
+ #include <BRepBuilderAPI_MakeEdge.hxx>
+void occQt::splines()
+{
+    // Note: it seems that OpenCascade prefers
+    //to start indexing control point arrays from one instead of zero :(
+    // Step 1: Define control points
+    TColgp_Array1OfPnt controlPoints(1, 5); // Array size 4 (1-based indexing in Open Cascade)
+    controlPoints.SetValue(1, gp_Pnt(1.0, 1.0, 0.0)); // Point 1
+    controlPoints.SetValue(2, gp_Pnt(2.0, 3.0, 0.0)); // Point 2
+    controlPoints.SetValue(3, gp_Pnt(3.0, 0.0, 0.0)); // Point 3
+    controlPoints.SetValue(4, gp_Pnt(4.0, 3.0, 0.0)); // Point 4
+    controlPoints.SetValue(5, gp_Pnt(5.0, 2.0, 0.0)); // Point 5
+    Handle(Geom_BezierCurve) bezierCurve = new Geom_BezierCurve(controlPoints);
+    TopoDS_Edge bezierEdge = BRepBuilderAPI_MakeEdge(bezierCurve);
+
+    Handle(AIS_Shape) curveVision = new AIS_Shape(bezierEdge);
+    curveVision->SetColor(Quantity_NOC_PALEGREEN);
+    myOccView->getContext()->Display(curveVision, Standard_True);
+
+    // Assume this is initialized properly
+    myOccView->fitAll();
+    myOccView->redraw();
+}
 
 

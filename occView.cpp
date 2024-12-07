@@ -142,6 +142,11 @@ void OccView::fitAll( void )
     myView->Redraw();
 }
 
+void OccView::redraw()
+{
+    myView->RedrawImmediate();
+}
+
 void OccView::deleteAll()
 {
     myContext->RemoveAll(true);
