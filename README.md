@@ -1,2 +1,2 @@
 # SimpleGM
-Sipmple application with CMake including Qt Widgets and OpenCascade 
+Simple application with CMake including Qt Widgets and OpenCascade 
