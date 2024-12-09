@@ -24,5 +24,6 @@
         <file>Resources/points.png</file>
         <file>Resources/lines.png</file>
         <file>Resources/spline.png</file>
+        <file>Resources/bspline.png</file>
     </qresource>
 </RCC>

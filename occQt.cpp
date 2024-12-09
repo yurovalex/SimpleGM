@@ -51,6 +51,7 @@ void occQt::createActions( void )
     connect(ui.actionPoints, SIGNAL(triggered()), this, SLOT(points()));
     connect(ui.actionLines, SIGNAL(triggered()), this, SLOT(lines()));
     connect(ui.actionSplines, SIGNAL(triggered()), this, SLOT(splines()));
+    connect(ui.actionBspline, SIGNAL(triggered()), this, SLOT(bspline()));
 
     // Primitive
     connect(ui.actionBox, SIGNAL(triggered()), this, SLOT(makeBox()));
@@ -80,6 +81,7 @@ void occQt::createToolBars( void )
     aToolBar->addAction(ui.actionBox);
     aToolBar->addAction(ui.actionCone);
     aToolBar->addAction(ui.actionLines);
+    aToolBar->addAction(ui.actionBspline);
 
     aToolBar = addToolBar(tr("Help"));
     aToolBar->addAction(ui.actionAbout);
@@ -167,17 +169,87 @@ void occQt::splines()
     // Note: it seems that OpenCascade prefers
     //to start indexing control point arrays from one instead of zero :(
     // Step 1: Define control points
-    TColgp_Array1OfPnt controlPoints(1, 5); // Array size 4 (1-based indexing in Open Cascade)
+    TColgp_Array1OfPnt controlPoints(1, 6); // Array size 6 (1-based indexing in Open Cascade)
     controlPoints.SetValue(1, gp_Pnt(1.0, 1.0, 0.0)); // Point 1
     controlPoints.SetValue(2, gp_Pnt(2.0, 3.0, 0.0)); // Point 2
     controlPoints.SetValue(3, gp_Pnt(3.0, 0.0, 0.0)); // Point 3
     controlPoints.SetValue(4, gp_Pnt(4.0, 3.0, 0.0)); // Point 4
     controlPoints.SetValue(5, gp_Pnt(5.0, 2.0, 0.0)); // Point 5
+     controlPoints.SetValue(6, gp_Pnt(15.0, 5.0, 5.0)); // Point 6
     Handle(Geom_BezierCurve) bezierCurve = new Geom_BezierCurve(controlPoints);
     TopoDS_Edge bezierEdge = BRepBuilderAPI_MakeEdge(bezierCurve);
 
     Handle(AIS_Shape) curveVision = new AIS_Shape(bezierEdge);
-    curveVision->SetColor(Quantity_NOC_PALEGREEN);
+    curveVision->SetWidth(3.0);
+    curveVision->SetColor(Quantity_NOC_WHITE);
+    myOccView->getContext()->Display(curveVision, Standard_True);
+
+    // Assume this is initialized properly
+    myOccView->fitAll();
+    myOccView->redraw();
+}
+
+#include <Geom_BSplineCurve.hxx>
+
+
+void occQt::bspline()
+{
+    // -------------------------------------------------------------------------------------------------------------- //
+    // Define the array of control points
+    // -------------------------------------------------------------------------------------------------------------- //
+
+    TColgp_Array1OfPnt P(1, 7);
+    P(1) = gp_Pnt(0.00, 0.0, 0.0);
+    P(2) = gp_Pnt(0.25, -0.5, 0.0);
+    P(3) = gp_Pnt(0.50, 0.0, 0.0);
+    P(4) = gp_Pnt(0.75, 0.0, 0.0);
+    P(5) = gp_Pnt(1.00, 0.0, 0.0);
+    P(6) = gp_Pnt(0.50, 0.5, 0.0);
+    P(7) = gp_Pnt(0.00, 0.5, 0.0);
+
+    // -------------------------------------------------------------------------------------------------------------- //
+    // Define the knot vector
+    // -------------------------------------------------------------------------------------------------------------- //
+
+    // Maximum index of the control points (counting from zero)
+    Standard_Integer n = P.Length() - 1;
+
+    // Define the order of the basis polynomials
+    // Linear (p = 1), Quadratic (p = 2), Cubic (p = 3), etc.
+    // Set p = n (number of control points minus one) to obtain Bezier basis polynomials
+    Standard_Integer p = 3;
+
+    // Define of the knot vector (clamped spline)
+    // p+1 zeros, n-p equispaced points between 0 and 1, and p+1 ones. N+1=n-p+2 distinct values
+    Standard_Integer N = n - p + 2 - 1;
+    TColStd_Array1OfReal U_values(0, N);
+    TColStd_Array1OfInteger U_mults(0, N);
+
+    for (int i = 0; i <= N; ++i) {
+
+        // Set the knot values
+        U_values(i) = double(i) / double(N);
+
+        // Set the knot multiplicities
+        if (i == 0 || i == N) { U_mults(i) = p+1; }
+        else { U_mults(i) = 1; }
+
+    }
+
+
+    // -------------------------------------------------------------------------------------------------------------- //
+    // Define the geometry and topology of a B-Spline curve
+    // -------------------------------------------------------------------------------------------------------------- //
+
+    // Create the geometry and reference it by handle
+    Handle(Geom_BSplineCurve) BSplineGeo = new Geom_BSplineCurve(P, U_values, U_mults, p);
+
+    // Define the topology of the B-Spline curve using the BRepBuilderAPI
+    TopoDS_Edge BSplineEdge = BRepBuilderAPI_MakeEdge(BSplineGeo);
+
+
+    Handle(AIS_Shape) curveVision = new AIS_Shape(BSplineEdge);
+    curveVision->SetColor(Quantity_NOC_LIGHTCYAN);
     myOccView->getContext()->Display(curveVision, Standard_True);
 
     // Assume this is initialized properly

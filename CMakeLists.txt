@@ -72,7 +72,7 @@ set(OpenCASCADE_Component
 add_executable(${PROJECT_NAME}
             ${PROJECT_SOURCES}
             occqt.qrc
-            Resources/lines.png
+
 )
 
 target_link_libraries(${PROJECT_NAME}

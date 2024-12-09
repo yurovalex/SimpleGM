@@ -24,12 +24,3 @@ export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/run/media/alexey/LinuxData/Cascade/occt
 ./SimpleGM
 
 
-//for git
-
-git init
-git remote add origin https://github.com/yurovalex/SimpleGM.git
-git add .
-git commit -m "a new curve (feature)"
-git push
-
-git status

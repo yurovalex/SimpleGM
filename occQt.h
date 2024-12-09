@@ -50,6 +50,8 @@ private slots:
     //!Splines
     void splines();
 
+    void bspline();
+
 
 
 

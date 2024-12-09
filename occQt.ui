@@ -73,6 +73,7 @@
     <addaction name="actionPoints"/>
     <addaction name="actionLines"/>
     <addaction name="actionSplines"/>
+    <addaction name="actionBspline"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuView"/>
@@ -221,7 +222,19 @@
      <normaloff>:/Resources/spline.png</normaloff>:/Resources/spline.png</iconset>
    </property>
    <property name="text">
-    <string>Splines</string>
+    <string>&amp;Splines</string>
+   </property>
+  </action>
+  <action name="actionBspline">
+   <property name="icon">
+    <iconset resource="occqt.qrc">
+     <normaloff>:/Resources/bspline.png</normaloff>:/Resources/bspline.png</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;Bspline</string>
+   </property>
+   <property name="toolTip">
+    <string>Bspline</string>
    </property>
   </action>
  </widget>
