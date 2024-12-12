@@ -53,6 +53,13 @@ private slots:
     void bspline();
 
 
+    //!surfaces
+    //! bezier_surface
+    void bezier_surface();
+
+    //! surface_2boundares
+    void surface_2boundares();
+
 
 
 private:

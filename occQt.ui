@@ -75,10 +75,18 @@
     <addaction name="actionSplines"/>
     <addaction name="actionBspline"/>
    </widget>
+   <widget class="QMenu" name="menuSurface">
+    <property name="title">
+     <string>Surfaces</string>
+    </property>
+    <addaction name="actionbezier_surface"/>
+    <addaction name="actionsurface_2boundares"/>
+   </widget>
    <addaction name="menuFile"/>
    <addaction name="menuView"/>
    <addaction name="menuPrimitive"/>
    <addaction name="menu2D"/>
+   <addaction name="menuSurface"/>
    <addaction name="menuModeling"/>
    <addaction name="menuHelp"/>
   </widget>
@@ -235,6 +243,24 @@
    </property>
    <property name="toolTip">
     <string>Bspline</string>
+   </property>
+  </action>
+  <action name="actionbezier_surface">
+   <property name="icon">
+    <iconset resource="occqt.qrc">
+     <normaloff>:/Resources/bezier.png</normaloff>:/Resources/bezier.png</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;bezier_surface</string>
+   </property>
+  </action>
+  <action name="actionsurface_2boundares">
+   <property name="icon">
+    <iconset resource="occqt.qrc">
+     <normaloff>:/Resources/some_surface3.png</normaloff>:/Resources/some_surface3.png</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;surface_2boundares</string>
    </property>
   </action>
  </widget>

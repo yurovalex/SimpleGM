@@ -36,30 +36,53 @@ occQt::~occQt()
 void occQt::createActions( void )
 {
     // File
-    connect(ui.actionExit, SIGNAL(triggered()), this, SLOT(close()));
+    //old syntax
+    //connect(ui.actionExit, SIGNAL(triggered()), this, SLOT(close()));
+    //new syntax
+    connect(ui.actionExit, &QAction::triggered, this, &occQt::close);
 
     // View
-    connect(ui.actionZoom, SIGNAL(triggered()), myOccView, SLOT(zoom()));
+    //connect(ui.actionZoom, SIGNAL(triggered()), myOccView, SLOT(zoom()));
+    connect(ui.actionZoom, &QAction::triggered, myOccView, &OccView::zoom);
 
-    connect(ui.actionPan, SIGNAL(triggered()), myOccView, SLOT(pan()));
-    connect(ui.actionRotate, SIGNAL(triggered()), myOccView, SLOT(rotate()));
 
-    connect(ui.actionReset, SIGNAL(triggered()), myOccView, SLOT(reset()));
-    connect(ui.actionFitAll, SIGNAL(triggered()), myOccView, SLOT(fitAll()));
-    connect(ui.actionDeleteAll, SIGNAL(triggered()), myOccView, SLOT(deleteAll()));
+    //connect(ui.actionPan, SIGNAL(triggered()), myOccView, SLOT(pan()));
+    connect(ui.actionPan, &QAction::triggered, myOccView, &OccView::pan);
+
+    //connect(ui.actionRotate, SIGNAL(triggered()), myOccView, SLOT(rotate()));
+    connect(ui.actionRotate, &QAction::triggered, myOccView, &OccView::rotate);
+
+    //connect(ui.actionReset, SIGNAL(triggered()), myOccView, SLOT(reset()));
+    connect(ui.actionReset, &QAction::triggered, myOccView, &OccView::reset);
+    //connect(ui.actionFitAll, SIGNAL(triggered()), myOccView, SLOT(fitAll()));
+    connect(ui.actionFitAll, &QAction::triggered, myOccView, &OccView::fitAll);
+    //connect(ui.actionDeleteAll, SIGNAL(triggered()), myOccView, SLOT(deleteAll()));
+    connect(ui.actionDeleteAll, &QAction::triggered, myOccView, &OccView::deleteAll);
 
     //2D
-    connect(ui.actionPoints, SIGNAL(triggered()), this, SLOT(points()));
-    connect(ui.actionLines, SIGNAL(triggered()), this, SLOT(lines()));
-    connect(ui.actionSplines, SIGNAL(triggered()), this, SLOT(splines()));
-    connect(ui.actionBspline, SIGNAL(triggered()), this, SLOT(bspline()));
+    //connect(ui.actionPoints, SIGNAL(triggered()), this, SLOT(points()));
+    connect(ui.actionPoints, &QAction::triggered, this, &occQt::points);
+    //connect(ui.actionLines, SIGNAL(triggered()), this, SLOT(lines()));
+    connect(ui.actionLines, &QAction::triggered, this, &occQt::lines);
+    //connect(ui.actionSplines, SIGNAL(triggered()), this, SLOT(splines()));
+    connect(ui.actionSplines, &QAction::triggered, this, &occQt::splines);
+    //connect(ui.actionBspline, SIGNAL(triggered()), this, SLOT(bspline()));
+    connect(ui.actionBspline, &QAction::triggered, this, &occQt::bspline);
+
+    //Surfaces
+    connect(ui.actionbezier_surface, &QAction::triggered, this, &occQt::bezier_surface);
+    connect(ui.actionsurface_2boundares, &QAction::triggered, this, &occQt::surface_2boundares);
+
 
     // Primitive
-    connect(ui.actionBox, SIGNAL(triggered()), this, SLOT(makeBox()));
-    connect(ui.actionCone, SIGNAL(triggered()), this, SLOT(makeCone()));
+    //connect(ui.actionBox, SIGNAL(triggered()), this, SLOT(makeBox()));
+    connect(ui.actionBox, &QAction::triggered, this, &occQt::makeBox);
+    //connect(ui.actionCone, SIGNAL(triggered()), this, SLOT(makeCone()));
+    connect(ui.actionCone, &QAction::triggered, this, &occQt::makeCone);
 
     // Help
-    connect(ui.actionAbout, SIGNAL(triggered()), this, SLOT(about()));
+    //connect(ui.actionAbout, SIGNAL(triggered()), this, SLOT(about()));
+    connect(ui.actionAbout, &QAction::triggered, this, &occQt::about);
 }
 
 void occQt::createMenus( void )
@@ -86,6 +109,16 @@ void occQt::createToolBars( void )
 
     aToolBar = addToolBar(tr("Help"));
     aToolBar->addAction(ui.actionAbout);
+
+    aToolBar = addToolBar(tr("&Surface"));
+    aToolBar->setAllowedAreas(Qt::LeftToolBarArea);
+
+    aToolBar->addAction(ui.actionbezier_surface);
+    aToolBar->addAction(ui.actionsurface_2boundares);
+    this->addToolBar(Qt::LeftToolBarArea, aToolBar);
+
+
+
 }
 
 void occQt::about()
@@ -257,5 +290,116 @@ void occQt::bspline()
     myOccView->fitAll();
     myOccView->redraw();
 }
+
+#include <Geom_BezierSurface.hxx>
+#include <BRepBuilderAPI_MakeFace.hxx>
+void occQt::bezier_surface()
+{
+    // -------------------------------------------------------------------------------------------------------------- //
+    // Define the array of control points
+    // -------------------------------------------------------------------------------------------------------------- //
+
+    // Declare the array
+    Standard_Integer rowLower = 1, rowUpper = 5;
+    Standard_Integer colLower = 1, colUpper = 3;
+    TColgp_Array2OfPnt P(rowLower, rowUpper, colLower, colUpper);
+
+    // First row
+    P(1, 1) = gp_Pnt(0.00, 0.0, 0.0);
+    P(2, 1) = gp_Pnt(0.25, 0.0, 0.0);
+    P(3, 1) = gp_Pnt(0.50, 0.0, 0.0);
+    P(4, 1) = gp_Pnt(0.75, 0.0, 0.0);
+    P(5, 1) = gp_Pnt(1.00, 0.0, 0.0);
+
+    // Second row
+    P(1, 2) = gp_Pnt(0.00, 0.5, 0.0);
+    P(2, 2) = gp_Pnt(0.25, 0.5, 1.0);
+    P(3, 2) = gp_Pnt(0.50, 0.5, 1.0);
+    P(4, 2) = gp_Pnt(0.75, 0.5, 1.0);
+    P(5, 2) = gp_Pnt(1.00, 0.5, 0.0);
+
+    // Third row
+    P(1, 3) = gp_Pnt(0.00, 1.0, 0.0);
+    P(2, 3) = gp_Pnt(0.25, 1.0, 0.0);
+    P(3, 3) = gp_Pnt(0.50, 1.0, 0.0);
+    P(4, 3) = gp_Pnt(0.75, 1.0, 0.0);
+    P(5, 3) = gp_Pnt(1.00, 1.0, 0.0);
+
+
+    // -------------------------------------------------------------------------------------------------------------- //
+    // Define the geometry and topology of a Bezier surface
+    // -------------------------------------------------------------------------------------------------------------- //
+
+    // Define the geometry of a Bezier surface referenced by handle
+    Handle(Geom_BezierSurface) BezierGeo = new Geom_BezierSurface(P);
+
+    // Define the topology of the Bezier surface using the BRepBuilderAPI
+    TopoDS_Face BezierFace = BRepBuilderAPI_MakeFace(BezierGeo, 0);
+
+    // Get the geometric surface from the topological face and check the bounds in parametric space [Optional]
+    Handle(Geom_Surface) BezierGeo_bis = BRep_Tool::Surface (BezierFace);
+    double u_lower, u_upper, v_lower, v_upper;
+    BezierGeo_bis->Bounds(u_lower, u_upper, v_lower, v_upper);
+
+    // Create a TopoDS_Shape object
+    TopoDS_Shape open_cascade_model = BezierFace;
+
+    Handle(AIS_Shape) surfaceVision = new AIS_Shape(open_cascade_model);
+    surfaceVision->SetColor(Quantity_NOC_MATRABLUE);
+    myOccView->getContext()->Display(surfaceVision, Standard_True);
+
+    myOccView->fitAll();
+}
+
+#include <GeomFill_BezierCurves.hxx>
+void occQt::surface_2boundares()
+{
+    // -------------------------------------------------------------------------------------------------------------- //
+    // Define the boundaries of the domain
+    // -------------------------------------------------------------------------------------------------------------- //
+
+    // The domain is defined by 2 contiguous Bezier curves
+    // Each Bezier curve is constructed from an array of control points and it is referenced by handle
+
+    // Boundary 1
+    TColgp_Array1OfPnt P_upper(1, 4);
+    P_upper(1) = gp_Pnt(0.00, 0.0, 0.0);
+    P_upper(2) = gp_Pnt(0.33, 1.0, 0.5);
+    P_upper(3) = gp_Pnt(0.66, 1.0, -0.5);
+    P_upper(4) = gp_Pnt(1.00, 0.0, 0.0);
+    Handle(Geom_BezierCurve) bezier_upper = new Geom_BezierCurve(P_upper);
+
+    // Boundary 2
+    TColgp_Array1OfPnt P_lower(1, 4);
+    P_lower(1) = bezier_upper->Pole(1);                                     // Conforming corner | same as P_upper(1)
+    P_lower(2) = gp_Pnt(0.33, -1.00, -0.50);
+    P_lower(3) = gp_Pnt(0.66, -1.00, 0.50);
+    P_lower(4) = bezier_upper->Pole(bezier_upper->NbPoles());               // Conforming corner | same as P_upper(3)
+    Handle(Geom_BezierCurve) bezier_lower = new Geom_BezierCurve(P_lower);
+
+
+
+    // -------------------------------------------------------------------------------------------------------------- //
+    // Create a Coons patch defined by its boundaries
+    // -------------------------------------------------------------------------------------------------------------- //
+
+    // Create the Bezier surface from the boundaries and a filling style
+    // Styles available: 1) GeomFill_CoonsStyle 2) GeomFill_StretchStyle 3) GeomFill_CurvedStyle
+    GeomFill_BezierCurves makeBezierSurfGeo(bezier_upper, bezier_lower, GeomFill_CoonsStyle);
+    Handle(Geom_BezierSurface) BezierSurfGeo = makeBezierSurfGeo.Surface();
+
+    // Define the topology of the Bezier surface using the BRepBuilderAPI
+    TopoDS_Face BezierSurfTopo = BRepBuilderAPI_MakeFace(BezierSurfGeo, 0.);
+
+    // Create a TopoDS_Shape object
+    TopoDS_Shape open_cascade_model = BezierSurfTopo;
+    Handle(AIS_Shape) surfaceVision = new AIS_Shape(open_cascade_model);
+    surfaceVision->SetColor(Quantity_NOC_MATRAGRAY);
+    myOccView->getContext()->Display(surfaceVision, Standard_True);
+
+    myOccView->fitAll();
+}
+
+
 
 

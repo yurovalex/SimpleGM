@@ -25,5 +25,10 @@
         <file>Resources/lines.png</file>
         <file>Resources/spline.png</file>
         <file>Resources/bspline.png</file>
+        <file>Resources/some_surface.png</file>
+        <file>Resources/some_surface2.png</file>
+        <file>Resources/some_surface3.png</file>
+        <file>Resources/some_surface4.png</file>
+        <file>Resources/bezier.png</file>
     </qresource>
 </RCC>
