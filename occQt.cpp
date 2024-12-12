@@ -40,6 +40,7 @@ void occQt::createActions( void )
 
     // View
     connect(ui.actionZoom, SIGNAL(triggered()), myOccView, SLOT(zoom()));
+
     connect(ui.actionPan, SIGNAL(triggered()), myOccView, SLOT(pan()));
     connect(ui.actionRotate, SIGNAL(triggered()), myOccView, SLOT(rotate()));
 
@@ -90,7 +91,7 @@ void occQt::createToolBars( void )
 void occQt::about()
 {
     QMessageBox::about(this, tr("About SimpleGM for Qt"),
-        tr("<h2>occQt 2.1</h2>"
+        tr("<h2>occQt 2.2</h2>"
         "<p>Copyright &copy; 2014-2024 eryar@163.com (yurovalex2@gmail.com)"
         "<p>SimpleGM is a demo applicaton about Qt and OpenCASCADE."));
 }

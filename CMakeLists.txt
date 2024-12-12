@@ -6,12 +6,12 @@ set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 
-set(CMAKE_CXX_STANDARD 23)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets OpenGL)
-find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets)
-
+find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets)
+find_package(Qt6 REQUIRED COMPONENTS OpenGLWidgets)
+find_package(Qt6 REQUIRED COMPONENTS Core)
 
 set(PROJECT_SOURCES
         main.cpp
@@ -22,18 +22,18 @@ set(PROJECT_SOURCES
         occQt.ui
 )
 
-if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
-    qt_add_executable(${PROJECT_NAME}
-        MANUAL_FINALIZATION
-        ${PROJECT_SOURCES}
-    )
-endif()
-
 
 #!Задан путь до сборки
+#linux path
+if (UNIX)
 set(THIRD_PARTY_PATH /run/media/alexey/LinuxData/Cascade/occt_linux_build780)
-message(${CMAKE_SOURCE_DIR})
+endif (UNIX)
+#windows path
+if (WIN32)
+set(THIRD_PARTY_PATH D:/Cascade/occt_win_build780)
+endif (WIN32)
 
+message(${CMAKE_SOURCE_DIR})
 include_directories(${THIRD_PARTY_PATH}/inc)
 
 # Set the CMake build type to Debug if not specified
@@ -44,10 +44,10 @@ endif()
 
 #windows path
 if (WIN32)
-    link_directories(${THIRD_PARTY_PATH}/win64/gcc/lib)
+    link_directories(${THIRD_PARTY_PATH}/mingw/gcc/lib)
     if(CMAKE_BUILD_TYPE STREQUAL "Debug")
         message(STATUS "Building in Debug mode")
-        link_directories(${THIRD_PARTY_PATH}/win64/gcc/libd)
+        link_directories(${THIRD_PARTY_PATH}/mingw/gcc/libd)
     endif()
 endif (WIN32)
 
@@ -72,33 +72,16 @@ set(OpenCASCADE_Component
 add_executable(${PROJECT_NAME}
             ${PROJECT_SOURCES}
             occqt.qrc
-
 )
 
 target_link_libraries(${PROJECT_NAME}
-    PRIVATE Qt${QT_VERSION_MAJOR}::Widgets
+    PRIVATE
+    Qt6::Widgets
+    Qt6::OpenGLWidgets
+    Qt6::Core
     ${OpenCASCADE_Component}
 )
 
 
-# if(${QT_VERSION} VERSION_LESS 6.1.0)
-#   set(BUNDLE_ID_OPTION MACOSX_BUNDLE_GUI_IDENTIFIER com.example.occQt)
-# endif()
-# set_target_properties(${PROJECT_NAME} PROPERTIES
-#     ${BUNDLE_ID_OPTION}
-#     MACOSX_BUNDLE_BUNDLE_VERSION ${PROJECT_VERSION}
-#     MACOSX_BUNDLE_SHORT_VERSION_STRING ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}
-#     MACOSX_BUNDLE TRUE
-#     WIN32_EXECUTABLE TRUE
-# )
-#
-# include(GNUInstallDirs)
-# install(TARGETS ${PROJECT_NAME}
-#     BUNDLE DESTINATION .
-#     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-#     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-# )
-#
-# if(QT_VERSION_MAJOR EQUAL 6)
-#     qt_finalize_executable(${PROJECT_NAME})
-# endif()
+
+

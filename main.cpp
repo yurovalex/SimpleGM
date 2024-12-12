@@ -1,4 +1,3 @@
-
 #include "occQt.h"
 #include <QApplication>
 

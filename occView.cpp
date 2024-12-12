@@ -13,11 +13,7 @@
 #include <Aspect_Handle.hxx>
 #include <Aspect_DisplayConnection.hxx>
 
-#ifdef WNT
-    #include <WNT_Window.hxx>
-#elif defined(__APPLE__) && !defined(MACOSX_USE_GLX)
-    #include <Cocoa_Window.hxx>
-#else
+#ifdef __linux__
     #undef Bool
     #undef CursorShape
     #undef None
@@ -28,7 +24,31 @@
     #undef FontChange
     #undef Expose
     #include <Xw_Window.hxx>
+#elif _WIN32
+    #include <WNT_Window.hxx>
+#elif defined(__APPLE__) && !defined(MACOSX_USE_GLX)
+    #include <Cocoa_Window.hxx>
+#else
+
 #endif
+
+
+// #ifdef WNT
+//     #include <WNT_Window.hxx>
+// #elif defined(__APPLE__) && !defined(MACOSX_USE_GLX)
+//     #include <Cocoa_Window.hxx>
+// #else
+//     #undef Bool
+//     #undef CursorShape
+//     #undef None
+//     #undef KeyPress
+//     #undef KeyRelease
+//     #undef FocusIn
+//     #undef FocusOut
+//     #undef FontChange
+//     #undef Expose
+//     #include <Xw_Window.hxx>
+// #endif
 
 
 static Handle(Graphic3d_GraphicDriver)& GetGraphicDriver()
@@ -46,20 +66,7 @@ OccView::OccView(QWidget* parent )
     myCurrentMode(CurAction3d_DynamicRotation),
     myDegenerateModeIsOn(Standard_True),
     myRectBand(NULL)
-{
-    // No Background
-    setBackgroundRole( QPalette::NoRole );
-
-    // set focus policy to threat QContextMenuEvent from keyboard  
-    setFocusPolicy(Qt::StrongFocus);
-    setAttribute(Qt::WA_PaintOnScreen);
-    setAttribute(Qt::WA_NoSystemBackground);
-
-    // Enable the mouse tracking, by default the mouse tracking is disabled.
-    setMouseTracking( true );
-
-    init();
-}
+{}
 
 void OccView::init()
 {
@@ -74,22 +81,19 @@ void OccView::init()
     }
 
     // Get window handle. This returns something suitable for all platforms.
-    WId window_handle = (WId) winId();
+    Aspect_Handle window_handle =   (Aspect_Handle)winId();
 
-    // Create appropriate window for platform
-    #ifdef WNT
-        Handle(WNT_Window) wind = new WNT_Window((Aspect_Handle) window_handle);
-    #elif defined(__APPLE__) && !defined(MACOSX_USE_GLX)
-        Handle(Cocoa_Window) wind = new Cocoa_Window((NSView *) window_handle);
-    #else
+    #ifdef __linux__
         Handle(Xw_Window) wind = new Xw_Window(aDisplayConnection, window_handle);
+    #elif _WIN32
+        Handle(WNT_Window) wind = new WNT_Window((Aspect_Handle) window_handle);
+    #else
+        Handle(Cocoa_Window) wind = new Cocoa_Window((NSView *) window_handle);
     #endif
 
     // Create V3dViewer and V3d_View
     myViewer = new V3d_Viewer(GetGraphicDriver());
-
     myView = myViewer->CreateView();
-
     myView->SetWindow(wind);
     if (!wind->IsMapped()) wind->Map();
 
@@ -105,7 +109,6 @@ void OccView::init()
     myView->TriedronDisplay(Aspect_TOTP_LEFT_LOWER, Quantity_NOC_GOLD, 0.08, V3d_ZBUFFER);
 
     myContext->SetDisplayMode(AIS_Shaded, Standard_True);
-
 
 }
 
@@ -124,6 +127,17 @@ QPaintEngine* OccView::paintEngine() const
 
 void OccView::paintEvent( QPaintEvent* /*theEvent*/ )
 {
+    if( myView.IsNull() )
+    {
+        init();
+        // No Background
+        setBackgroundRole( QPalette::NoRole );
+
+        // set focus policy to threat QContextMenuEvent from keyboard
+        setFocusPolicy(Qt::StrongFocus);
+        setAttribute(Qt::WA_PaintOnScreen);
+        setAttribute(Qt::WA_NoSystemBackground);
+    }
     myView->Redraw();
 }
 
