@@ -9,6 +9,12 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+
+
+
+#support Visual Studio 2022
+#set(CMAKE_PREFIX_PATH "C:/Qt/6.8.1/msvc2022_64") 
+
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets)
 find_package(Qt6 REQUIRED COMPONENTS OpenGLWidgets)
 find_package(Qt6 REQUIRED COMPONENTS Core)
@@ -48,6 +54,8 @@ if (WIN32)
     if(CMAKE_BUILD_TYPE STREQUAL "Debug")
         message(STATUS "Building in Debug mode")
         link_directories(${THIRD_PARTY_PATH}/mingw/gcc/libd)
+        #support Visual Studio 2022
+	#link_directories(${THIRD_PARTY_PATH}/vc2022/libd)
     endif()
 endif (WIN32)
 
