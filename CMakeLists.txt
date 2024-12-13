@@ -26,6 +26,9 @@ set(PROJECT_SOURCES
         occView.h
         occView.cpp
         occQt.ui
+
+        surfaces.h
+        surfaces.cpp
 )
 
 

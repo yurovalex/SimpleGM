@@ -1,6 +1,7 @@
 
 #include "occQt.h"
 #include "occView.h"
+#include "surfaces.h"
 
 #include <QToolBar>
 #include <QTreeView>
@@ -22,6 +23,9 @@ occQt::occQt(QWidget *parent)
 {
     ui.setupUi(this);
     myOccView = new OccView(this);
+    //for surfaces
+    mySurfaces = std::make_unique<Surfaces>(myOccView);
+
     setCentralWidget(myOccView);
     createActions();
     createMenus();
@@ -30,7 +34,7 @@ occQt::occQt(QWidget *parent)
 
 occQt::~occQt()
 {
-
+    delete myOccView;
 }
 
 void occQt::createActions( void )
@@ -70,9 +74,10 @@ void occQt::createActions( void )
     connect(ui.actionBspline, &QAction::triggered, this, &occQt::bspline);
 
     //Surfaces
-    connect(ui.actionbezier_surface, &QAction::triggered, this, &occQt::bezier_surface);
-    connect(ui.actionsurface_2boundares, &QAction::triggered, this, &occQt::surface_2boundares);
-
+    connect(ui.actionBezier_surface, &QAction::triggered, mySurfaces.get(), &Surfaces::bezier_surface);
+    connect(ui.actionBezier_surface_rational, &QAction::triggered, mySurfaces.get(), &Surfaces::bezier_surface_rational);
+    connect(ui.actionSurface_2boundares, &QAction::triggered, mySurfaces.get(), &Surfaces::surface_2boundares);
+    connect(ui.actionRuled_surface, &QAction::triggered, mySurfaces.get(), &Surfaces::ruled_surface);
 
     // Primitive
     //connect(ui.actionBox, SIGNAL(triggered()), this, SLOT(makeBox()));
@@ -113,12 +118,11 @@ void occQt::createToolBars( void )
     aToolBar = addToolBar(tr("&Surface"));
     aToolBar->setAllowedAreas(Qt::LeftToolBarArea);
 
-    aToolBar->addAction(ui.actionbezier_surface);
-    aToolBar->addAction(ui.actionsurface_2boundares);
+    aToolBar->addAction(ui.actionBezier_surface);
+    aToolBar->addAction(ui.actionBezier_surface_rational);
+    aToolBar->addAction(ui.actionSurface_2boundares);
+    aToolBar->addAction(ui.actionRuled_surface);
     this->addToolBar(Qt::LeftToolBarArea, aToolBar);
-
-
-
 }
 
 void occQt::about()
@@ -291,114 +295,6 @@ void occQt::bspline()
     myOccView->redraw();
 }
 
-#include <Geom_BezierSurface.hxx>
-#include <BRepBuilderAPI_MakeFace.hxx>
-void occQt::bezier_surface()
-{
-    // -------------------------------------------------------------------------------------------------------------- //
-    // Define the array of control points
-    // -------------------------------------------------------------------------------------------------------------- //
-
-    // Declare the array
-    Standard_Integer rowLower = 1, rowUpper = 5;
-    Standard_Integer colLower = 1, colUpper = 3;
-    TColgp_Array2OfPnt P(rowLower, rowUpper, colLower, colUpper);
-
-    // First row
-    P(1, 1) = gp_Pnt(0.00, 0.0, 0.0);
-    P(2, 1) = gp_Pnt(0.25, 0.0, 0.0);
-    P(3, 1) = gp_Pnt(0.50, 0.0, 0.0);
-    P(4, 1) = gp_Pnt(0.75, 0.0, 0.0);
-    P(5, 1) = gp_Pnt(1.00, 0.0, 0.0);
-
-    // Second row
-    P(1, 2) = gp_Pnt(0.00, 0.5, 0.0);
-    P(2, 2) = gp_Pnt(0.25, 0.5, 1.0);
-    P(3, 2) = gp_Pnt(0.50, 0.5, 1.0);
-    P(4, 2) = gp_Pnt(0.75, 0.5, 1.0);
-    P(5, 2) = gp_Pnt(1.00, 0.5, 0.0);
-
-    // Third row
-    P(1, 3) = gp_Pnt(0.00, 1.0, 0.0);
-    P(2, 3) = gp_Pnt(0.25, 1.0, 0.0);
-    P(3, 3) = gp_Pnt(0.50, 1.0, 0.0);
-    P(4, 3) = gp_Pnt(0.75, 1.0, 0.0);
-    P(5, 3) = gp_Pnt(1.00, 1.0, 0.0);
-
-
-    // -------------------------------------------------------------------------------------------------------------- //
-    // Define the geometry and topology of a Bezier surface
-    // -------------------------------------------------------------------------------------------------------------- //
-
-    // Define the geometry of a Bezier surface referenced by handle
-    Handle(Geom_BezierSurface) BezierGeo = new Geom_BezierSurface(P);
-
-    // Define the topology of the Bezier surface using the BRepBuilderAPI
-    TopoDS_Face BezierFace = BRepBuilderAPI_MakeFace(BezierGeo, 0);
-
-    // Get the geometric surface from the topological face and check the bounds in parametric space [Optional]
-    Handle(Geom_Surface) BezierGeo_bis = BRep_Tool::Surface (BezierFace);
-    double u_lower, u_upper, v_lower, v_upper;
-    BezierGeo_bis->Bounds(u_lower, u_upper, v_lower, v_upper);
-
-    // Create a TopoDS_Shape object
-    TopoDS_Shape open_cascade_model = BezierFace;
-
-    Handle(AIS_Shape) surfaceVision = new AIS_Shape(open_cascade_model);
-    surfaceVision->SetColor(Quantity_NOC_MATRABLUE);
-    myOccView->getContext()->Display(surfaceVision, Standard_True);
-
-    myOccView->fitAll();
-}
-
-#include <GeomFill_BezierCurves.hxx>
-void occQt::surface_2boundares()
-{
-    // -------------------------------------------------------------------------------------------------------------- //
-    // Define the boundaries of the domain
-    // -------------------------------------------------------------------------------------------------------------- //
-
-    // The domain is defined by 2 contiguous Bezier curves
-    // Each Bezier curve is constructed from an array of control points and it is referenced by handle
-
-    // Boundary 1
-    TColgp_Array1OfPnt P_upper(1, 4);
-    P_upper(1) = gp_Pnt(0.00, 0.0, 0.0);
-    P_upper(2) = gp_Pnt(0.33, 1.0, 0.5);
-    P_upper(3) = gp_Pnt(0.66, 1.0, -0.5);
-    P_upper(4) = gp_Pnt(1.00, 0.0, 0.0);
-    Handle(Geom_BezierCurve) bezier_upper = new Geom_BezierCurve(P_upper);
-
-    // Boundary 2
-    TColgp_Array1OfPnt P_lower(1, 4);
-    P_lower(1) = bezier_upper->Pole(1);                                     // Conforming corner | same as P_upper(1)
-    P_lower(2) = gp_Pnt(0.33, -1.00, -0.50);
-    P_lower(3) = gp_Pnt(0.66, -1.00, 0.50);
-    P_lower(4) = bezier_upper->Pole(bezier_upper->NbPoles());               // Conforming corner | same as P_upper(3)
-    Handle(Geom_BezierCurve) bezier_lower = new Geom_BezierCurve(P_lower);
-
-
-
-    // -------------------------------------------------------------------------------------------------------------- //
-    // Create a Coons patch defined by its boundaries
-    // -------------------------------------------------------------------------------------------------------------- //
-
-    // Create the Bezier surface from the boundaries and a filling style
-    // Styles available: 1) GeomFill_CoonsStyle 2) GeomFill_StretchStyle 3) GeomFill_CurvedStyle
-    GeomFill_BezierCurves makeBezierSurfGeo(bezier_upper, bezier_lower, GeomFill_CoonsStyle);
-    Handle(Geom_BezierSurface) BezierSurfGeo = makeBezierSurfGeo.Surface();
-
-    // Define the topology of the Bezier surface using the BRepBuilderAPI
-    TopoDS_Face BezierSurfTopo = BRepBuilderAPI_MakeFace(BezierSurfGeo, 0.);
-
-    // Create a TopoDS_Shape object
-    TopoDS_Shape open_cascade_model = BezierSurfTopo;
-    Handle(AIS_Shape) surfaceVision = new AIS_Shape(open_cascade_model);
-    surfaceVision->SetColor(Quantity_NOC_MATRAGRAY);
-    myOccView->getContext()->Display(surfaceVision, Standard_True);
-
-    myOccView->fitAll();
-}
 
 
 

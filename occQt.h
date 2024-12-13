@@ -6,8 +6,10 @@
 
 #include "ui_occQt.h"
 #include <AIS_InteractiveContext.hxx>
+#include <memory>
 
 class OccView;
+class Surfaces;
 
 //! Qt main window which include OpenCASCADE for its central widget.
 class occQt : public QMainWindow
@@ -53,12 +55,6 @@ private slots:
     void bspline();
 
 
-    //!surfaces
-    //! bezier_surface
-    void bezier_surface();
-
-    //! surface_2boundares
-    void surface_2boundares();
 
 
 
@@ -67,6 +63,8 @@ private:
 
     // wrapped the widget for occ.
     OccView* myOccView;
+
+    std::unique_ptr<Surfaces> mySurfaces;
 };
 
 //#endif // OCCQT_H

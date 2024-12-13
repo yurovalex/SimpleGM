@@ -79,8 +79,10 @@
     <property name="title">
      <string>Surfaces</string>
     </property>
-    <addaction name="actionbezier_surface"/>
-    <addaction name="actionsurface_2boundares"/>
+    <addaction name="actionBezier_surface"/>
+    <addaction name="actionBezier_surface_rational"/>
+    <addaction name="actionSurface_2boundares"/>
+    <addaction name="actionRuled_surface"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuView"/>
@@ -245,7 +247,7 @@
     <string>Bspline</string>
    </property>
   </action>
-  <action name="actionbezier_surface">
+  <action name="actionBezier_surface">
    <property name="icon">
     <iconset resource="occqt.qrc">
      <normaloff>:/Resources/bezier.png</normaloff>:/Resources/bezier.png</iconset>
@@ -254,13 +256,31 @@
     <string>&amp;bezier_surface</string>
    </property>
   </action>
-  <action name="actionsurface_2boundares">
+  <action name="actionSurface_2boundares">
    <property name="icon">
     <iconset resource="occqt.qrc">
      <normaloff>:/Resources/some_surface3.png</normaloff>:/Resources/some_surface3.png</iconset>
    </property>
    <property name="text">
     <string>&amp;surface_2boundares</string>
+   </property>
+  </action>
+  <action name="actionBezier_surface_rational">
+   <property name="icon">
+    <iconset resource="occqt.qrc">
+     <normaloff>:/Resources/bezier_rational.png</normaloff>:/Resources/bezier_rational.png</iconset>
+   </property>
+   <property name="text">
+    <string>bezier_surface_rational</string>
+   </property>
+  </action>
+  <action name="actionRuled_surface">
+   <property name="icon">
+    <iconset resource="occqt.qrc">
+     <normaloff>:/Resources/some_surface.png</normaloff>:/Resources/some_surface.png</iconset>
+   </property>
+   <property name="text">
+    <string>ruled_surface</string>
    </property>
   </action>
  </widget>
