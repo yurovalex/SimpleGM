@@ -10,10 +10,10 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 
-
-
 #support Visual Studio 2022
-#set(CMAKE_PREFIX_PATH "C:/Qt/6.8.1/msvc2022_64") 
+if (MSVC)
+    set(CMAKE_PREFIX_PATH "C:/Qt/6.8.1/msvc2022_64")
+endif (MSVC)
 
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets)
 find_package(Qt6 REQUIRED COMPONENTS OpenGLWidgets)
@@ -26,21 +26,25 @@ set(PROJECT_SOURCES
         occView.h
         occView.cpp
         occQt.ui
-
         surfaces.h
         surfaces.cpp
 )
 
 
-#!Задан путь до сборки
+#Set path for assembly framework .OpenCascade
 #linux path
 if (UNIX)
-set(THIRD_PARTY_PATH /run/media/alexey/LinuxData/Cascade/occt_linux_build780)
+    set(THIRD_PARTY_PATH /run/media/alexey/LinuxData/Cascade/occt_linux_build780)
 endif (UNIX)
 #windows path
 if (WIN32)
-set(THIRD_PARTY_PATH D:/Cascade/occt_win_build780)
+    set(THIRD_PARTY_PATH D:/Cascade/occt_win_build780)
 endif (WIN32)
+
+#apple mac os path
+if (APPLE)
+    set(THIRD_PARTY_PATH /Users/admin/Documents/MacData/occt_mac_build780)
+endif(APPLE)
 
 message(${CMAKE_SOURCE_DIR})
 include_directories(${THIRD_PARTY_PATH}/inc)
@@ -50,26 +54,36 @@ if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Debug)
 endif()
 
-
 #windows path
 if (WIN32)
     link_directories(${THIRD_PARTY_PATH}/mingw/gcc/lib)
     if(CMAKE_BUILD_TYPE STREQUAL "Debug")
         message(STATUS "Building in Debug mode")
         link_directories(${THIRD_PARTY_PATH}/mingw/gcc/libd)
-        #support Visual Studio 2022
-	#link_directories(${THIRD_PARTY_PATH}/vc2022/libd)
+        if (MSVC)
+            #support Visual Studio 2022
+            link_directories(${THIRD_PARTY_PATH}/vc2022/libd)
+        endif (MSVC)
     endif()
 endif (WIN32)
 
-if (UNIX)
+
 #linux path
+if (UNIX)
+
     link_directories(${THIRD_PARTY_PATH}/lin64/gcc/lib)
     if(CMAKE_BUILD_TYPE STREQUAL "Debug")
         message(STATUS "Building in Debug mode")
         link_directories(${THIRD_PARTY_PATH}/lin64/gcc/libd)
     endif()
 endif (UNIX)
+
+#apple path
+if (APPLE)
+    link_directories(${THIRD_PARTY_PATH}/mac64/clang/libd)
+endif(APPLE)
+
+
 set(OpenCASCADE_Component
   TKernel TKService TKV3d TKOpenGl
   TKBRep TKGeomBase TKGeomAlgo TKG3d TKG2d TKTopAlgo
