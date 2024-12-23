@@ -278,3 +278,58 @@ void Surfaces::ruled_surface()
     myOccView->fitAll();
 }
 
+#include <TopoDS_Face.hxx>
+#include <BRepBuilderAPI_MakeFace.hxx>
+#include <Geom_Surface.hxx>
+#include <Geom_BezierSurface.hxx>
+void Surfaces::SampleSurface()
+{
+
+    //Build surface 3D -change z koordinate
+    // int arraySize=3;
+    // TColgp_Array2OfPnt myStucture(0,arraySize,0,arraySize);
+    // for(int i=0; i<=arraySize; i++)
+    // {
+    //     for(int j=0; j<=arraySize; j++)
+    //     {
+    //         int z=-3+rand()%6;
+    //         myStucture.SetValue(j,i,gp_Pnt(i,j,z));
+    //     }
+    // }
+    // Handle (Geom_Surface) myGSurface = new
+    //     Geom_BezierSurface(myStucture);
+    // TopoDS_Face myFace = BRepBuilderAPI_MakeFace(myGSurface,0.01);
+    // Handle(AIS_Shape) aisFace=new AIS_Shape(myFace);
+    // aisFace->SetWidth(3.0);
+    // aisFace->SetColor(Quantity_NOC_ORANGE1);
+    // myOccView->getContext()->Display(aisFace, true );
+
+    double size=3,step=0.5;
+    int arraySize=static_cast<int>(2*size/step);
+    double myKGlade=2.0;
+    int i=0,j;
+    TColgp_Array2OfPnt myStucture(0,arraySize,0,arraySize);
+    for(float x=-size; x<=size; x+=step)
+    {
+        j=0;
+        for(float y=-size; y<=size;y+=step)
+        {
+            double z=(x*x+y*y)/myKGlade;
+            myStucture.SetValue(i,j,gp_Pnt(x,y,z));
+            j++;
+        }
+        i++;
+    }
+    Handle (Geom_Surface) myGSurface = new
+        Geom_BezierSurface(myStucture);
+    TopoDS_Face myFace = BRepBuilderAPI_MakeFace(myGSurface,0.01);
+    Handle(AIS_Shape) aisFace=new AIS_Shape(myFace);
+    aisFace->SetWidth(3.0);
+    aisFace->SetColor(Quantity_NOC_ORANGE1);
+    myOccView->getContext()->Display(aisFace, true );
+
+
+    myOccView->fitAll();
+
+}
+

@@ -79,6 +79,9 @@ void occQt::createActions( void )
     connect(ui.actionSurface_2boundares, &QAction::triggered, mySurfaces.get(), &Surfaces::surface_2boundares);
     connect(ui.actionRuled_surface, &QAction::triggered, mySurfaces.get(), &Surfaces::ruled_surface);
 
+    connect(ui.actionSampleSurface, &QAction::triggered, mySurfaces.get(), &Surfaces::SampleSurface);
+
+
     // Primitive
     //connect(ui.actionBox, SIGNAL(triggered()), this, SLOT(makeBox()));
     connect(ui.actionBox, &QAction::triggered, this, &occQt::makeBox);

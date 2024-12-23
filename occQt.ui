@@ -24,7 +24,7 @@
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>33</height>
+     <height>26</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -83,6 +83,7 @@
     <addaction name="actionBezier_surface_rational"/>
     <addaction name="actionSurface_2boundares"/>
     <addaction name="actionRuled_surface"/>
+    <addaction name="actionSampleSurface"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuView"/>
@@ -281,6 +282,11 @@
    </property>
    <property name="text">
     <string>ruled_surface</string>
+   </property>
+  </action>
+  <action name="actionSampleSurface">
+   <property name="text">
+    <string>SampleSurface</string>
    </property>
   </action>
  </widget>

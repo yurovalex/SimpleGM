@@ -27,6 +27,10 @@ class Surfaces:public QObject
     void ruled_surface();
 
 
+    //!SampleSurface
+    void SampleSurface();
+
+
     private:
     // wrapped the widget for occ.
     OccView* myOccView;
