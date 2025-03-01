@@ -31,5 +31,6 @@
         <file>Resources/some_surface4.png</file>
         <file>Resources/bezier.png</file>
         <file>Resources/bezier_rational.png</file>
+        <file>Resources/some_surface5.png</file>
     </qresource>
 </RCC>

@@ -35,3 +35,8 @@
 build
 
 *.user
+<<<<<<< HEAD
+=======
+
+git.txt
+>>>>>>> f6689b1 (support Open Cascade 7.9 only tested on  Linux)

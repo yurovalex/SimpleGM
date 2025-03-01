@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.26)
 
-project(SimpleGM VERSION 2.1 LANGUAGES CXX)
+project(SimpleGM VERSION 2.11 LANGUAGES CXX)
 
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
@@ -12,7 +12,9 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 #support Visual Studio 2022
 if (MSVC)
-    set(CMAKE_PREFIX_PATH "C:/Qt/6.8.1/msvc2022_64")
+    #PATH_QT_MSVC  -> C:/Qt/6.8.1/msvc2022_64
+    set(CMAKE_PREFIX_PATH ${PATH_QT_MSVC})
+
 endif (MSVC)
 
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets)
@@ -30,20 +32,23 @@ set(PROJECT_SOURCES
         surfaces.cpp
 )
 
-
 #Set path for assembly framework .OpenCascade
 #linux path
-if (UNIX)
-    set(THIRD_PARTY_PATH /run/media/alexey/LinuxData/Cascade/occt_linux_build780)
+
+if (UNIX)   
+    #PATH_CASCADE_LINUX  ->  /run/media/alexey/LinuxData/Cascade/occ_linux_build790)
+    set(THIRD_PARTY_PATH ${PATH_CASCADE_LINUX})
 endif (UNIX)
 #windows path
 if (WIN32)
-    set(THIRD_PARTY_PATH D:/Cascade/occt_win_build780)
+    #PATH_CASCADE_WINDOWS  -> D:/Cascade/occt_win_build780
+    set(THIRD_PARTY_PATH ${PATH_CASCADE_WINDOWS})
 endif (WIN32)
 
 #apple mac os path
 if (APPLE)
-    set(THIRD_PARTY_PATH /Users/admin/Documents/MacData/occt_mac_build780)
+    #PATH_CASCADE_APPLE  -> /Users/admin/Documents/MacData/occt_mac_build780
+    set(THIRD_PARTY_PATH ${PATH_CASCADE_APPLE})
 endif(APPLE)
 
 message(${CMAKE_SOURCE_DIR})

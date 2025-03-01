@@ -272,7 +272,7 @@
      <normaloff>:/Resources/bezier_rational.png</normaloff>:/Resources/bezier_rational.png</iconset>
    </property>
    <property name="text">
-    <string>bezier_surface_rational</string>
+    <string>b&amp;ezier_surface_rational</string>
    </property>
   </action>
   <action name="actionRuled_surface">
@@ -281,12 +281,16 @@
      <normaloff>:/Resources/some_surface.png</normaloff>:/Resources/some_surface.png</iconset>
    </property>
    <property name="text">
-    <string>ruled_surface</string>
+    <string>&amp;ruled_surface</string>
    </property>
   </action>
   <action name="actionSampleSurface">
+   <property name="icon">
+    <iconset resource="occqt.qrc">
+     <normaloff>:/Resources/some_surface5.png</normaloff>:/Resources/some_surface5.png</iconset>
+   </property>
    <property name="text">
-    <string>SampleSurface</string>
+    <string>S&amp;ampleSurface</string>
    </property>
   </action>
  </widget>

@@ -78,7 +78,6 @@ void occQt::createActions( void )
     connect(ui.actionBezier_surface_rational, &QAction::triggered, mySurfaces.get(), &Surfaces::bezier_surface_rational);
     connect(ui.actionSurface_2boundares, &QAction::triggered, mySurfaces.get(), &Surfaces::surface_2boundares);
     connect(ui.actionRuled_surface, &QAction::triggered, mySurfaces.get(), &Surfaces::ruled_surface);
-
     connect(ui.actionSampleSurface, &QAction::triggered, mySurfaces.get(), &Surfaces::SampleSurface);
 
 
@@ -125,6 +124,7 @@ void occQt::createToolBars( void )
     aToolBar->addAction(ui.actionBezier_surface_rational);
     aToolBar->addAction(ui.actionSurface_2boundares);
     aToolBar->addAction(ui.actionRuled_surface);
+    aToolBar->addAction(ui.actionSampleSurface);
     this->addToolBar(Qt::LeftToolBarArea, aToolBar);
 }
 
