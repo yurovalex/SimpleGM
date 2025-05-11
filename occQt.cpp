@@ -72,6 +72,8 @@ void occQt::createActions( void )
     connect(ui.actionSplines, &QAction::triggered, this, &occQt::splines);
     //connect(ui.actionBspline, SIGNAL(triggered()), this, SLOT(bspline()));
     connect(ui.actionBspline, &QAction::triggered, this, &occQt::bspline);
+    connect(ui.actionIntersection, &QAction::triggered, this, &occQt::intersectDemo);
+
 
     //Surfaces
     connect(ui.actionBezier_surface, &QAction::triggered, mySurfaces.get(), &Surfaces::bezier_surface);
@@ -86,6 +88,10 @@ void occQt::createActions( void )
     connect(ui.actionBox, &QAction::triggered, this, &occQt::makeBox);
     //connect(ui.actionCone, SIGNAL(triggered()), this, SLOT(makeCone()));
     connect(ui.actionCone, &QAction::triggered, this, &occQt::makeCone);
+
+    // Mesh
+    connect(ui.actionTesselation_1, &QAction::triggered, this, &occQt::Tesselaion);
+
 
     // Help
     //connect(ui.actionAbout, SIGNAL(triggered()), this, SLOT(about()));
@@ -113,6 +119,7 @@ void occQt::createToolBars( void )
     aToolBar->addAction(ui.actionCone);
     aToolBar->addAction(ui.actionLines);
     aToolBar->addAction(ui.actionBspline);
+    aToolBar->addAction(ui.actionIntersection);
 
     aToolBar = addToolBar(tr("Help"));
     aToolBar->addAction(ui.actionAbout);
@@ -131,8 +138,8 @@ void occQt::createToolBars( void )
 void occQt::about()
 {
     QMessageBox::about(this, tr("About SimpleGM for Qt"),
-        tr("<h2>occQt 2.2</h2>"
-        "<p>Copyright &copy; 2014-2024 eryar@163.com (yurovalex2@gmail.com)"
+        tr("<h2>occQt 2.3</h2>"
+        "<p>Copyright &copy; 2014-2025 eryar@163.com (yurovalex2@gmail.com)"
         "<p>SimpleGM is a demo applicaton about Qt and OpenCASCADE."));
 }
 
@@ -292,6 +299,171 @@ void occQt::bspline()
     Handle(AIS_Shape) curveVision = new AIS_Shape(BSplineEdge);
     curveVision->SetColor(Quantity_NOC_LIGHTCYAN);
     myOccView->getContext()->Display(curveVision, Standard_True);
+
+    // Assume this is initialized properly
+    myOccView->fitAll();
+    myOccView->redraw();
+}
+
+#include <BRepBuilderAPI_MakeFace.hxx>
+#include <BRepBuilderAPI_MakeWire.hxx>
+#include <GeomAPI_IntSS.hxx>
+#include <BRepAlgoAPI_Section.hxx>
+#include <BRepBuilderAPI_MakePolygon.hxx>
+
+TopoDS_Face MakeTriangleFace(const gp_Pnt& p1, const gp_Pnt& p2, const gp_Pnt& p3) {
+    BRepBuilderAPI_MakePolygon polygon;
+    polygon.Add(p1);
+    polygon.Add(p2);
+    polygon.Add(p3);
+    polygon.Close(); // Обязательно замкнуть треугольник
+    return BRepBuilderAPI_MakeFace(polygon.Wire());
+}
+
+//Intersect two triangles
+void occQt::intersectDemo()
+{
+    //TopoDS_Edge E1 = BRepBuilderAPI_MakeEdge(gp_Pnt(0,0,0), gp_Pnt(0,10,0));
+    //TopoDS_Edge E2 = BRepBuilderAPI_MakeEdge(gp_Pnt(0,10,0), gp_Pnt(10,0,0));
+    //TopoDS_Edge E3 = BRepBuilderAPI_MakeEdge(gp_Pnt(10,0,0), gp_Pnt(0,0,0));
+    //TopoDS_Face face1 = BRepBuilderAPI_MakeFace (BRepBuilderAPI_MakeWire(E1,E2,E3), false);
+
+    //TopoDS_Edge E4 = BRepBuilderAPI_MakeEdge(gp_Pnt(5,5,15), gp_Pnt(-5,10,-5));
+    //TopoDS_Edge E5 = BRepBuilderAPI_MakeEdge(gp_Pnt(-5,10,-5), gp_Pnt(15,10,-5));
+    //TopoDS_Edge E6 = BRepBuilderAPI_MakeEdge(gp_Pnt(15,10,-5), gp_Pnt(5,5,15));
+    //TopoDS_Face face2 = BRepBuilderAPI_MakeFace (BRepBuilderAPI_MakeWire(E4,E5,E6), false);
+
+    //Handle(Geom_Surface) f1 =BRep_Tool::Surface(face1);
+    //Handle(Geom_Surface) f2 =BRep_Tool::Surface(face2);
+    //GeomAPI_IntSS Intersector (f1,f2,0.1);
+    //Handle(Geom_Curve) line =  Intersector.Line(1);
+
+
+    TopoDS_Face triangle1 = MakeTriangleFace(
+        gp_Pnt(0, 0, 0),
+        gp_Pnt(10, 0, 0),
+        gp_Pnt(0, 10, 0)
+        );
+
+    TopoDS_Face triangle2 = MakeTriangleFace(
+        gp_Pnt(5, -5, -5),
+        gp_Pnt(5, 15, 5),
+        gp_Pnt(5, -5, 5)
+        );
+
+
+    BRepAlgoAPI_Section section(triangle1, triangle2);
+    section.ComputePCurveOn1(Standard_False);
+    section.ComputePCurveOn2(Standard_False);
+    section.Approximation(Standard_True);
+    section.Build();
+
+    if (!section.IsDone()) {
+        std::cerr << "Ошибка: пересечение не удалось построить!" << std::endl;
+        return;
+    }
+
+    TopoDS_Shape result = section.Shape();
+
+    Handle(AIS_Shape) vline = new AIS_Shape(result);
+    vline->SetColor(Quantity_NOC_BLACK);
+    vline->SetWidth(10.);
+    myOccView->getContext()->Display(vline, Standard_False);
+
+     Handle(AIS_Shape) vf1 = new AIS_Shape(triangle1);
+     vf1->SetColor(Quantity_NOC_LIGHTCYAN);
+     myOccView->getContext()->Display(vf1, Standard_False);
+
+     Handle(AIS_Shape) vf2 = new AIS_Shape(triangle2);
+     vf2->SetColor(Quantity_NOC_LIGHTCORAL);
+     myOccView->getContext()->Display(vf2, Standard_True);
+
+    // Assume this is initialized properly
+    myOccView->fitAll();
+    myOccView->redraw();
+
+}
+
+
+#include <BRepMesh_IncrementalMesh.hxx>
+#include <TopExp_Explorer.hxx>
+#include <TopoDS_Face.hxx>
+#include <Poly_Triangulation.hxx>
+#include <BRep_Tool.hxx>
+#include <BRepPrimAPI_MakeCylinder.hxx>
+#include <Poly_Triangulation.hxx>
+#include <TColgp_Array1OfPnt.hxx>
+#include <AIS_Triangulation.hxx>
+//Mesh
+void occQt::Tesselaion()
+{
+    NCollection_Vector<Handle(AIS_InteractiveObject)> myObject3d;
+    gp_Ax2 anAxis;
+    anAxis.SetLocation(gp_Pnt(0.0, 10.0, 0.0));
+    TopoDS_Shape aTopoCylinder = BRepPrimAPI_MakeCylinder(anAxis, 3.0, 10.).Shape();
+
+
+
+    // Параметры: shape, линейная точность
+    //(deflection), относительная точность, угол (в радианах), параллельность
+    BRepMesh_IncrementalMesh (aTopoCylinder, 0.01, Standard_True, 0.05, Standard_True);
+
+
+    BRep_Builder aBuilder;
+    TopoDS_Compound aCompound;
+    aBuilder.MakeCompound(aCompound);
+
+    Standard_Integer aNbTriangles(0);
+    for (TopExp_Explorer anExplorer(aTopoCylinder, TopAbs_FACE); anExplorer.More(); anExplorer.Next())
+    {
+        TopoDS_Face aFace = TopoDS::Face(anExplorer.Current());
+        TopLoc_Location aLocation;
+        Handle(Poly_Triangulation) aTriangulation = BRep_Tool::Triangulation(aFace, aLocation);
+
+        for (Standard_Integer i = 1; i <= aTriangulation->NbTriangles(); i++)
+        {
+            const Poly_Triangle trian = aTriangulation->Triangle (i);
+            Standard_Integer index1, index2, index3, M = 0, N = 0;
+            trian.Get(index1, index2, index3);
+
+            for (Standard_Integer j = 1; j <= 3; j++)
+            {
+                switch (j)
+                {
+                case 1:
+                    M = index1;
+                    N = index2;
+                    break;
+                case 2:
+                    N = index3;
+                    break;
+                case 3:
+                    M = index2;
+                }
+
+                BRepBuilderAPI_MakeEdge anEdgeMaker(aTriangulation->Node (M), aTriangulation->Node (N));
+                if (anEdgeMaker.IsDone())
+                {
+                    aBuilder.Add(aCompound, anEdgeMaker.Edge());
+                }
+            }
+        }
+        Handle(AIS_Triangulation) anAisTriangulation = new AIS_Triangulation(aTriangulation);
+        aNbTriangles += aTriangulation->NbTriangles();
+        myObject3d.Append(anAisTriangulation);
+    }
+
+    Handle(AIS_Shape)  anAisCompound = new AIS_Shape(aCompound);
+    myObject3d.Append(anAisCompound);
+
+    Handle(AIS_Shape) AISCyl = new AIS_Shape(aTopoCylinder);
+    myObject3d.Append(AISCyl);
+
+
+    for (Handle(AIS_InteractiveObject) &i: myObject3d){
+         myOccView->getContext()->Display(i, Standard_True);
+    }
+
 
     // Assume this is initialized properly
     myOccView->fitAll();

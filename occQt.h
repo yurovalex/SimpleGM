@@ -51,11 +51,13 @@ private slots:
 
     //!Splines
     void splines();
-
     void bspline();
 
+    //!Intersect
+    void intersectDemo();
 
-
+    //!Mesh
+    void Tesselaion();
 
 
 private:
